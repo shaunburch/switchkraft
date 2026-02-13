@@ -53,6 +53,7 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
