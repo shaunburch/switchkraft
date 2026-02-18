@@ -47,7 +47,7 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Publish to Maven Central
-        run: ./gradlew :switchkraft:publishAndReleaseToMavenCentral -PVERSION_NAME=${{ steps.version.outputs.VERSION }}
+        run: ./gradlew publishAggregationToCentralPortal -PVERSION_NAME=${{ steps.version.outputs.VERSION }}
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}
