@@ -1,3 +1,24 @@
+fun gitVersion(): String {
+    fun git(vararg args: String) =
+        ProcessBuilder(*args)
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start().inputStream.bufferedReader().readLine()?.trim()
+
+    val exactTag = runCatching {
+        git("git", "describe", "--tags", "--exact-match")
+    }.getOrNull()
+
+    return if (exactTag != null) {
+        exactTag.removePrefix("v")
+    } else {
+        val latestTag = runCatching {
+            git("git", "describe", "--tags", "--abbrev=0")
+        }.getOrNull()?.removePrefix("v") ?: "0.0.0"
+        "$latestTag-SNAPSHOT"
+    }
+}
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose)
@@ -49,7 +70,7 @@ publishing {
         create<MavenPublication>("release") {
             groupId = "dev.switchkraft"
             artifactId = "switchkraft"
-            version = project.findProperty("VERSION_NAME")?.toString() ?: "0.0.0-SNAPSHOT"
+            version = gitVersion()
 
             pom {
                 name.set("Switchkraft")
