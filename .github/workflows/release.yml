@@ -8,62 +8,43 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3
 
       - name: Run tests
-        run: ./gradlew :switchkraft:testReleaseUnitTest
+        run: ./gradlew :library:testDebugUnitTest
 
   publish-release:
     needs: test
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Extract version from tag
-        id: version
-        run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          VERSION="${VERSION#v}"
-          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3
 
       - name: Publish to Maven Central
-        run: ./gradlew publishAggregationToCentralPortal -PVERSION_NAME=${{ steps.version.outputs.VERSION }}
+        run: ./gradlew publishAggregationToCentralPortal
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}
           CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
           CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
-
-      - name: Bump snapshot version (stable releases only)
-        if: ${{ !github.event.release.prerelease }}
-        run: |
-          VERSION="${{ steps.version.outputs.VERSION }}"
-          MAJOR=$(echo $VERSION | cut -d. -f1)
-          MINOR=$(echo $VERSION | cut -d. -f2)
-          NEXT="${MAJOR}.$((MINOR + 1)).0-SNAPSHOT"
-          sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${NEXT}/" gradle.properties
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add gradle.properties
-          git commit -m "chore: bump snapshot to ${NEXT} after ${VERSION} release"
-          git push origin main
