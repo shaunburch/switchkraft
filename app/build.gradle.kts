@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.switchkraft"
+    namespace = "dev.switchkraft.sample"
     compileSdk {
         version = release(36)
     }
@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":switchkraft"))
+    implementation(project(":library"))
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     implementation(libs.compose.runtime)
