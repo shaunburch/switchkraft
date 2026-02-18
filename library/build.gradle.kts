@@ -1,20 +1,19 @@
 fun gitVersion(): String {
-    fun git(vararg args: String) =
-        ProcessBuilder(*args)
+    fun git(vararg args: String): String? {
+        val process = ProcessBuilder(*args)
             .directory(rootDir)
             .redirectErrorStream(true)
-            .start().inputStream.bufferedReader().readLine()?.trim()
+            .start()
+        val output = process.inputStream.bufferedReader().readLine()?.trim()
+        return if (process.waitFor() == 0) output else null
+    }
 
-    val exactTag = runCatching {
-        git("git", "describe", "--tags", "--exact-match")
-    }.getOrNull()
+    val exactTag = git("git", "describe", "--tags", "--exact-match")
 
     return if (exactTag != null) {
         exactTag.removePrefix("v")
     } else {
-        val latestTag = runCatching {
-            git("git", "describe", "--tags", "--abbrev=0")
-        }.getOrNull()?.removePrefix("v") ?: "0.0.0"
+        val latestTag = git("git", "describe", "--tags", "--abbrev=0")?.removePrefix("v") ?: "0.0.0"
         "$latestTag-SNAPSHOT"
     }
 }
