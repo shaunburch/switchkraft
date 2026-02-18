@@ -2,6 +2,66 @@
 
 A Jetpack Compose library for building forms that switch between **View** and **Edit** modes, with built-in revert and commit support.
 
+## Installation
+
+### Stable releases (Maven Central)
+
+No extra repository configuration needed. Add the dependency to your module's `build.gradle.kts`:
+
+```kotlin
+implementation("dev.switchkraft:switchkraft:VERSION")
+```
+
+Replace `VERSION` with the latest release version.
+
+### Snapshots (GitHub Packages)
+
+Snapshots are published automatically after every push to `main`. They require a GitHub Personal Access Token (PAT) with `read:packages` scope.
+
+1. Create a PAT at GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens (or classic with `read:packages`).
+
+2. Add your credentials to `~/.gradle/gradle.properties`:
+   ```properties
+   gpr.user=YOUR_GITHUB_USERNAME
+   gpr.key=YOUR_GITHUB_PAT
+   ```
+
+3. In your project's `settings.gradle.kts`, add the GitHub Packages repository:
+   ```kotlin
+   dependencyResolutionManagement {
+       repositories {
+           maven {
+               url = uri("https://maven.pkg.github.com/shaunburch/switchkraft")
+               credentials {
+                   username = providers.gradleProperty("gpr.user").get()
+                   password = providers.gradleProperty("gpr.key").get()
+               }
+           }
+       }
+   }
+   ```
+
+4. Add the snapshot dependency to your module's `build.gradle.kts`:
+   ```kotlin
+   implementation("dev.switchkraft:switchkraft:VERSION-SNAPSHOT")
+   ```
+
+---
+
+## Releases
+
+Switchkraft follows a snapshot → pre-release → stable version flow.
+
+| Artifact | How it's published |
+|---|---|
+| `X.Y.Z-SNAPSHOT` | Automatically on every push to `main` → GitHub Packages |
+| `X.Y.Z-alphaNNN` | Create a GitHub Release (marked pre-release) with tag `vX.Y.Z-alphaNNN` → Maven Central |
+| `X.Y.Z` | Create a GitHub Release (not pre-release) with tag `vX.Y.Z` → Maven Central |
+
+After a stable release, `gradle.properties` is automatically updated to the next minor snapshot (e.g. `0.1.0` → `0.2.0-SNAPSHOT`) via a bot commit.
+
+---
+
 ## Core Concepts
 
 | Type | Role |
