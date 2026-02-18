@@ -4,8 +4,9 @@ fun gitVersion(): String {
             .directory(rootDir)
             .redirectErrorStream(true)
             .start()
-        val output = process.inputStream.bufferedReader().readLine()?.trim()
-        return if (process.waitFor() == 0) output else null
+        val output = process.inputStream.bufferedReader().use { it.readLine() }?.trim()
+        val exitCode = process.waitFor()
+        return if (exitCode == 0) output else null
     }
 
     val exactTag = git("git", "describe", "--tags", "--exact-match")
